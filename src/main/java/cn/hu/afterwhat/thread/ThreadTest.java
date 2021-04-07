@@ -1,13 +1,17 @@
 package cn.hu.afterwhat.thread;
 
-import cn.hutool.core.date.TimeInterval;
 import lombok.SneakyThrows;
 
 public class ThreadTest {
 
+    public static int auth = 0;
+    public static Object auth1 = 0;
+    public static byte[] lock = new byte[0];
+
+
 
     public static void main(String[] args) {
-        try {
+        /*try {
             TimeInterval interval = new TimeInterval();
             Thread thread = test2();
             thread.start();
@@ -17,7 +21,21 @@ public class ThreadTest {
             System.err.println("main().TimeInterval = " + interval.interval());
         } catch (InterruptedException e) {
             System.err.println("main().Thread.sleep() = " + e.getMessage());
+        }*/
+
+
+        Thread thread = test3();
+        Thread thread1 = test3();
+        thread.start();
+        thread1.start();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        thread.interrupt();
+//        thread1.interrupt();
 
 
     }
@@ -65,6 +83,33 @@ public class ThreadTest {
                 for (int i = 0; i < 1000; i++) {
                     Thread.sleep(100);
                     System.out.println("i = " + i);
+                }
+
+            }
+        };
+        return thread;
+    }
+
+    public static Thread test3() {
+        Thread thread = new Thread() {
+            @SneakyThrows
+            @Override
+            public void run() {
+                super.run();
+
+                int i = 0;
+                while (true) {
+
+                    synchronized (lock){
+                        lock.wait();
+                        i ++;
+                        System.out.println(i);
+                        lock.notifyAll();
+                    }
+
+                    if (i > 1000) {
+                        return;
+                    }
                 }
 
             }
